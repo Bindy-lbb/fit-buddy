@@ -1,0 +1,200 @@
+@import 'tailwindcss';
+
+/*
+ * 字体自托管，不走 Google Fonts —— 国内访问不到 fonts.googleapis.com，
+ * 挂着它会让首屏白等一个超时。只取 latin 子集：中文由系统字体渲染，
+ * IBM Plex 只负责数字、日期和英文昵称。六个字重合计约 90KB，缓存一次管很久。
+ */
+@import '@fontsource/ibm-plex-mono/latin-400.css';
+@import '@fontsource/ibm-plex-mono/latin-600.css';
+@import '@fontsource/ibm-plex-mono/latin-700.css';
+@import '@fontsource/ibm-plex-sans/latin-400.css';
+@import '@fontsource/ibm-plex-sans/latin-600.css';
+@import '@fontsource/ibm-plex-sans/latin-700.css';
+
+/*
+ * 设计方向：打卡 = 盖章。
+ * 「打卡」这个词本身来自打孔考勤卡，所以整套视觉就做成一张纸质考勤卡：
+ * 米白纸张 + 墨黑字 + 朱红印章，只有这两个颜色，不引入第三种。
+ * 打卡是唯一的高频动作，所以只有它配得上朱红。
+ */
+@theme {
+  --font-sans: 'IBM Plex Sans', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --color-paper: #f2ede3;
+  --color-card: #fcfaf5;
+  --color-ink: #191712;
+  --color-muted: #6b6558;
+  --color-rule: #d9d1c1;
+  --color-stamp: #c1402e;
+  --color-stamp-soft: #ecd7d1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #121110;
+    --color-card: #1c1a17;
+    --color-ink: #f0eae0;
+    --color-muted: #928b7d;
+    --color-rule: #35302a;
+    --color-stamp: #e2593f;
+    --color-stamp-soft: #3a231d;
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  overscroll-behavior-y: none;
+}
+
+/* 纸张颗粒：一层固定的噪点，让米白不像纯色块 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-color-scheme: dark) {
+  body::before {
+    opacity: 0.09;
+    mix-blend-mode: screen;
+  }
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* 考勤卡上沿的打孔边 */
+.perforated {
+  background-image: radial-gradient(
+    circle at 5px 4px,
+    var(--color-rule) 1.6px,
+    transparent 1.7px
+  );
+  background-size: 14px 8px;
+  background-repeat: repeat-x;
+}
+
+/* 印章：所有已打卡格子共用。轻微旋转 + 正片叠底，像手盖上去的 */
+.stamp {
+  color: var(--color-stamp);
+  border: 1.5px solid currentColor;
+  transform: rotate(-6deg);
+}
+
+@media (prefers-color-scheme: light) {
+  .stamp {
+    mix-blend-mode: multiply;
+  }
+}
+
+/* 入场：打卡墙逐行落下，一次性的编排，不做零散的微动效 */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.42s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 55ms);
+}
+
+/* 盖章瞬间：按下去、弹起、墨迹扩散 */
+@keyframes stamp-hit {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  35% {
+    transform: scale(0.94) rotate(-1.5deg);
+  }
+  60% {
+    transform: scale(1.03) rotate(0.6deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.stamp-hit {
+  animation: stamp-hit 0.42s cubic-bezier(0.3, 1.4, 0.4, 1);
+}
+
+@keyframes ink-bleed {
+  from {
+    opacity: 0.5;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+.ink-bleed {
+  animation: ink-bleed 0.6s ease-out forwards;
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.sheet-up {
+  animation: sheet-up 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .stamp-hit,
+  .ink-bleed,
+  .sheet-up,
+  .fade-in {
+    animation: none;
+  }
+}
