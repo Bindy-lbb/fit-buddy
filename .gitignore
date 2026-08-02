@@ -6,3 +6,7 @@ dist
 *.log
 
 tsconfig.tsbuildinfo
+
+deploy/.env
+deploy/site/
+deploy/backups/

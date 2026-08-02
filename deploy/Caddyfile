@@ -1,0 +1,15 @@
+# 阶段 1：等待备案期间用 http://<IP> 访问。
+# 阶段 2 备案通过后，把第一行换成你的域名（见计划 Task 11）。
+http://:80 {
+    root * /srv/site
+    encode gzip
+
+    handle /rest/v1/* {
+        uri strip_prefix /rest/v1
+        reverse_proxy postgrest:3000
+    }
+
+    handle {
+        file_server
+    }
+}
