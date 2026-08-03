@@ -75,16 +75,18 @@ body::before {
   }
 }
 
-button {
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-}
+@layer base {
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
 
-input,
-textarea {
-  font: inherit;
-  color: inherit;
+  input,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
 }
 
 /* 考勤卡上沿的打孔边 */
