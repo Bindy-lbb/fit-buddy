@@ -1,6 +1,6 @@
 # FitBuddy 自托管部署实施计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 把 FitBuddy 部署到大陆云服务器上：Docker Compose 跑 Postgres + PostgREST + Caddy，先 IP 访问（备案等待期），备案通过后切域名 HTTPS。
 
@@ -18,7 +18,7 @@
 
 **Files:** 无（纯信息收集与外部操作）
 
-- [ ] **Step 1: 确认服务器可达**
+- [x] **Step 1: 确认服务器可达**
 
   本地执行：
   ```bash
@@ -26,7 +26,7 @@
   ```
   期望：能登录，看到 `root@...:~#`。如果第一次连不上，确认服务器已开通、密码/密钥正确、SSH 端口（默认 22）已放行。记下服务器 IP 和操作系统发行版（`cat /etc/os-release` 看名字，计划按 Ubuntu 写，其它发行版命令略不同）。
 
-- [ ] **Step 2: 安全组放行端口**
+- [x] **Step 2: 安全组放行端口**
 
   在云厂商控制台 → 安全组/防火墙，放行入站：**80**（阶段 1 用）和 **443**（阶段 2 用）。
 
@@ -49,13 +49,13 @@
 - Create: `deploy/.env.example`
 - Modify: `.gitignore`
 
-- [ ] **Step 1: 创建目录**
+- [x] **Step 1: 创建目录**
 
   ```bash
   mkdir -p deploy/postgres/init deploy/scripts
   ```
 
-- [ ] **Step 2: 写 `deploy/docker-compose.yml`**
+- [x] **Step 2: 写 `deploy/docker-compose.yml`**
 
   ```yaml
   services:
@@ -113,7 +113,7 @@
     app:
   ```
 
-- [ ] **Step 3: 写 `deploy/Caddyfile`（阶段 1：IP + HTTP 版）**
+- [x] **Step 3: 写 `deploy/Caddyfile`（阶段 1：IP + HTTP 版）**
 
   ```
   # 阶段 1：等待备案期间用 http://<IP> 访问。
@@ -135,7 +135,7 @@
 
   > `uri strip_prefix /rest/v1` 是关键：PostgREST 默认在根路径 `/` 提供服务，而 supabase-js 请求的是 `/rest/v1/...`，所以反代前必须去掉前缀。
 
-- [ ] **Step 4: 写 `deploy/postgres/init/001_roles.sql`**
+- [x] **Step 4: 写 `deploy/postgres/init/001_roles.sql`**
 
   ```sql
   -- 001：角色必须先于建表存在，RLS 策略引用了它们（仅首次初始化时执行）
@@ -143,13 +143,13 @@
   create role authenticated nologin;
   ```
 
-- [ ] **Step 5: 复制建表脚本为 `002_schema.sql`**
+- [x] **Step 5: 复制建表脚本为 `002_schema.sql`**
 
   ```bash
   cp supabase/schema.sql deploy/postgres/init/002_schema.sql
   ```
 
-- [ ] **Step 6: 写 `deploy/postgres/init/003_grants.sql`**
+- [x] **Step 6: 写 `deploy/postgres/init/003_grants.sql`**
 
   ```sql
   -- 003：自建 PostgREST 要给 anon/authenticated 授表权限（Supabase 云版默认配好，这里补上）
@@ -158,7 +158,7 @@
   grant select on public.member_progress to anon, authenticated;
   ```
 
-- [ ] **Step 7: 写 `deploy/scripts/gen-anon-jwt.mjs`**
+- [x] **Step 7: 写 `deploy/scripts/gen-anon-jwt.mjs`**
 
   ```js
   // 用法：node scripts/gen-anon-jwt.mjs <jwt-secret> [过期秒数，默认 10 年]
@@ -183,7 +183,7 @@
   console.log(`${header}.${payload}.${sig}`)
   ```
 
-- [ ] **Step 8: 写 `deploy/scripts/backup.sh`**
+- [x] **Step 8: 写 `deploy/scripts/backup.sh`**
 
   ```bash
   #!/usr/bin/env bash
@@ -197,7 +197,7 @@
   echo "backup ok: backups/fitbuddy-$STAMP.dump"
   ```
 
-- [ ] **Step 9: 写 `deploy/.env.example`**
+- [x] **Step 9: 写 `deploy/.env.example`**
 
   ```
   # 复制成 .env 并填写（.env 已 gitignore，不进仓库）
@@ -206,7 +206,7 @@
   JWT_SECRET=
   ```
 
-- [ ] **Step 10: 更新 `.gitignore`**
+- [x] **Step 10: 更新 `.gitignore`**
 
   追加三行（`dist`、`.env.local` 已有）：
   ```
@@ -215,7 +215,7 @@
   deploy/backups/
   ```
 
-- [ ] **Step 11: 校验并提交**
+- [x] **Step 11: 校验并提交**
 
   ```bash
   cd "D:/work/projects/fit-buddy"
@@ -231,13 +231,13 @@
 
 **Files:** 无（SSH 上执行）
 
-- [ ] **Step 1: SSH 登录服务器**
+- [x] **Step 1: SSH 登录服务器**
 
   ```bash
   ssh root@<服务器IP>
   ```
 
-- [ ] **Step 2: 安装 Docker + Compose 插件（Ubuntu/Debian）**
+- [x] **Step 2: 安装 Docker + Compose 插件（Ubuntu/Debian）**
 
   ```bash
   curl -fsSL https://get.docker.com | sh
@@ -245,7 +245,7 @@
   apt-get install -y docker-compose-plugin
   ```
 
-- [ ] **Step 3: 验证**
+- [x] **Step 3: 验证**
 
   ```bash
   docker --version && docker compose version
@@ -259,7 +259,7 @@
 **Files:**
 - Create: `deploy/.env`（gitignored）
 
-- [ ] **Step 1: 生成随机密码和 JWT 密钥**
+- [x] **Step 1: 生成随机密码和 JWT 密钥**
 
   ```bash
   cd "D:/work/projects/fit-buddy"
@@ -267,7 +267,7 @@
   openssl rand -base64 48   # → 记作 JWT_SECRET
   ```
 
-- [ ] **Step 2: 写 `deploy/.env`**
+- [x] **Step 2: 写 `deploy/.env`**
 
   把上一步两个值填进去：
   ```
@@ -275,14 +275,14 @@
   JWT_SECRET=<上面第二个值>
   ```
 
-- [ ] **Step 3: 生成 anon JWT 并保存到本地一个临时文件备用**
+- [x] **Step 3: 生成 anon JWT 并保存到本地一个临时文件备用**
 
   ```bash
   node deploy/scripts/gen-anon-jwt.mjs "$(grep JWT_SECRET deploy/.env | cut -d= -f2)"
   ```
   期望：打印一行 `eyJ...`。复制这行，稍后 Task 8 作为 `VITE_SUPABASE_ANON_KEY`。可临时存到 `deploy/.anon-key.tmp`（记得删除，或直接留在剪贴板）。
 
-- [ ] **Step 4: 验证 JWT 可解码（可选）**
+- [x] **Step 4: 验证 JWT 可解码（可选）**
 
   到 [jwt.io](https://jwt.io) 粘贴，Payload 应看到 `"role": "anon"`。
 
@@ -292,7 +292,7 @@
 
 **Files:** 无（本地 → 服务器）
 
-- [ ] **Step 1: 建 site 占位目录**
+- [x] **Step 1: 建 site 占位目录**
 
   ```bash
   cd "D:/work/projects/fit-buddy"
@@ -300,13 +300,13 @@
   echo '<h1>fitbuddy site ready</h1>' > deploy/site/index.html
   ```
 
-- [ ] **Step 2: scp 上传整个 deploy/ 到服务器**
+- [x] **Step 2: scp 上传整个 deploy/ 到服务器**
 
   ```bash
   scp -r deploy root@<服务器IP>:/opt/fitbuddy/
   ```
 
-- [ ] **Step 3: 服务器上确认**
+- [x] **Step 3: 服务器上确认**
 
   ```bash
   ssh root@<服务器IP> 'ls -R /opt/fitbuddy | head -40'
@@ -319,21 +319,21 @@
 
 **Files:** 无（SSH 上执行）
 
-- [ ] **Step 1: 启动 postgres（首次启动会执行 init 脚本）**
+- [x] **Step 1: 启动 postgres（首次启动会执行 init 脚本）**
 
   ```bash
   cd /opt/fitbuddy
   docker compose up -d postgres
   ```
 
-- [ ] **Step 2: 等健康检查通过**
+- [x] **Step 2: 等健康检查通过**
 
   ```bash
   docker compose ps
   ```
   期望：`postgres ... (healthy)`。若一直 unhealthy，看日志：`docker compose logs postgres`。
 
-- [ ] **Step 3: 验证表、角色、视图都在**
+- [x] **Step 3: 验证表、角色、视图都在**
 
   ```bash
   docker compose exec -T postgres psql -U postgres -d fitbuddy -c '\dt' -c '\dv' -c 'select rolname from pg_roles where rolname in (''anon'',''authenticated'');'
@@ -346,28 +346,28 @@
 
 **Files:** 无（SSH 上执行）
 
-- [ ] **Step 1: 起全部服务**
+- [x] **Step 1: 起全部服务**
 
   ```bash
   cd /opt/fitbuddy
   docker compose up -d
   ```
 
-- [ ] **Step 2: 验证 PostgREST 内部可访问**
+- [x] **Step 2: 验证 PostgREST 内部可访问**
 
   ```bash
   curl -s http://localhost:3000/ -H 'apikey: <anon JWT>' | head -20
   ```
   期望：返回 PostgREST 的 OpenAPI/Swagger JSON（包含 `groups`、`members` 等路径）。若 404/401，看日志 `docker compose logs postgrest`（最常见：JWT_SECRET 与 anon JWT 不匹配，或 grants 没生效）。
 
-- [ ] **Step 3: 验证 Caddy 反代链路**
+- [x] **Step 3: 验证 Caddy 反代链路**
 
   ```bash
   curl -s http://localhost:80/rest/v1/ -H 'apikey: <anon JWT>' -o /dev/null -w '%{http_code}\n'
   ```
   期望：`200`。此时 site/ 还是占位页，`curl http://localhost:80/` 应返回占位 HTML。
 
-- [ ] **Step 4: 从本机试外网 IP**
+- [x] **Step 4: 从本机试外网 IP**
 
   本地执行：
   ```bash
@@ -382,14 +382,14 @@
 **Files:**
 - Modify: `.env.local`（gitignored）
 
-- [ ] **Step 1: 写 `.env.local`**
+- [x] **Step 1: 写 `.env.local`**
 
   ```
   VITE_SUPABASE_URL=http://<服务器IP>
   VITE_SUPABASE_ANON_KEY=<anon JWT>
   ```
 
-- [ ] **Step 2: 构建**
+- [x] **Step 2: 构建**
 
   ```bash
   cd "D:/work/projects/fit-buddy"
@@ -398,13 +398,13 @@
   ```
   期望：`tsc` 和 `vite build` 都通过，产物在 `dist/`。
 
-- [ ] **Step 3: 上传构建产物到 site**
+- [x] **Step 3: 上传构建产物到 site**
 
   ```bash
   scp -r dist/* root@<服务器IP>:/opt/fitbuddy/site/
   ```
 
-- [ ] **Step 4: 验证页面可访问**
+- [x] **Step 4: 验证页面可访问**
 
   本地执行：
   ```bash
@@ -418,7 +418,7 @@
 
 **Files:** 无
 
-- [ ] **Step 1: 用正确邀请码建组**
+- [x] **Step 1: 用正确邀请码建组**
 
   本地执行（`<anon JWT>` 替换为真实值）：
   ```bash
@@ -429,7 +429,7 @@
   ```
   期望：返回 `201` + 一条含 `"code":"ABC123"` 的 JSON。
 
-- [ ] **Step 2: 用错误邀请码查询 → 应为空（RLS 生效）**
+- [x] **Step 2: 用错误邀请码查询 → 应为空（RLS 生效）**
 
   ```bash
   curl -s 'http://<服务器IP>/rest/v1/groups?select=*' \
@@ -437,7 +437,7 @@
   ```
   期望：`[]`。
 
-- [ ] **Step 3: 用正确邀请码查询 → 应有 1 条**
+- [x] **Step 3: 用正确邀请码查询 → 应有 1 条**
 
   ```bash
   curl -s 'http://<服务器IP>/rest/v1/groups?select=*' \
@@ -445,7 +445,7 @@
   ```
   期望：`[{"code":"ABC123",...}]`。这说明 RLS 认请求头、隔离正确。
 
-- [ ] **Step 4: 浏览器完整走一遍**
+- [x] **Step 4: 浏览器完整走一遍**
 
   手机/浏览器开 `http://<服务器IP>`：建组 → 添加自己 → 打卡 → 看打卡墙印章 → 切回来能刷新。确认顶部无「演示模式」。
   > 注：此时是 HTTP + IP，微信内置浏览器会提示不安全——这是阶段 1 预期内，正式发链接等阶段 2。
@@ -456,7 +456,7 @@
 
 **Files:** 无（SSH 上执行）
 
-- [ ] **Step 1: 让脚本可执行并试跑一次**
+- [x] **Step 1: 让脚本可执行并试跑一次**
 
   ```bash
   cd /opt/fitbuddy
@@ -466,7 +466,7 @@
   ```
   期望：打印 `backup ok: ...`，`backups/` 下出现一个 `.dump` 文件。
 
-- [ ] **Step 2: 加入 cron（每天凌晨 3 点）**
+- [x] **Step 2: 加入 cron（每天凌晨 3 点）**
 
   ```bash
   crontab -e
@@ -476,7 +476,7 @@
   0 3 * * * cd /opt/fitbuddy && ./scripts/backup.sh >> backups/backup.log 2>&1
   ```
 
-- [ ] **Step 3: 验证 cron 已装**
+- [x] **Step 3: 验证 cron 已装**
 
   ```bash
   crontab -l | grep backup
